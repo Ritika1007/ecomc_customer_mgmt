@@ -24,6 +24,8 @@ class CustomerOperation:
             return False
         if not CustomerOperation.validate_mobile(user_mobile):
             return False
+        if not UserOperation.validate_username(user_name):
+            return False
 
         if not UserOperation.check_username_exist(user_name):
             user_id = UserOperation.generate_unique_user_id()
@@ -35,41 +37,65 @@ class CustomerOperation:
 
     @staticmethod
     def update_profile(attribute_name, value, customer_object):
-        # Perform validations based on attribute_name
-        if attribute_name == 'user_email':
-            if not CustomerOperation.validate_email(value):
+        if attribute_name == 'user_name':
+            if UserOperation.validate_username(value):
+                if not UserOperation.check_username_exist(value):
+                    customer_object.user_name = value
+                else:
+                    print('Username already exists! Choose a different one')
+                    return False
+            else:
+                print('Username is  invalid!')
+                return False
+        elif attribute_name == 'user_password':
+            if UserOperation.validate_password(value):
+                customer_object.user_password = UserOperation.encrypt_password(value)
+            else:
+
+                return False
+        elif attribute_name == 'user_email':
+            if CustomerOperation.validate_email(value):
+                customer_object.user_email = value
+            else:
                 return False
         elif attribute_name == 'user_mobile':
-            if not CustomerOperation.validate_mobile(value):
+            if CustomerOperation.validate_mobile(value):
+                customer_object.user_mobile = value
+            else:
                 return False
-
-        # Update the attribute value in the customer_object
-        setattr(customer_object, attribute_name, value)
-
-        # Update the changes in the data/users.txt file
-        with open('data/users.txt', 'r+') as file:
-            lines = file.readlines()
-            file.seek(0)
-            for line in lines:
-                if line.strip() == str(customer_object):
-                    file.write(str(customer_object) + '\n')
-                else:
-                    file.write(line)
-            file.truncate()
+        else:
+            return False
         
-        return True
+        with open("data/users.txt", "r") as file:
+            user_data = file.readlines()
+
+        for i in range(0,len(user_data)):
+                user = eval(user_data[i])
+                
+                if user['user_id'] == customer_object.user_id:
+                    user[attribute_name] = value
+                    user_data[i] = str(user).replace(' ','')+"\n" 
+                    with open('data/users.txt', 'w') as file:
+                        file.writelines(user_data)
+                    
+                    return True
 
     @staticmethod
     def delete_customer(customer_id):
-        # Remove the customer from the data/users.txt file based on customer_id
-        with open('data/users.txt', 'r+') as file:
-            lines = file.readlines()
-            file.seek(0)
-            for line in lines:
-                if not line.startswith("{'user_id':'" + customer_id + "'"):
-                    file.write(line)
-            file.truncate()
-        
+        file_path = 'data/users.txt'
+        lines = []
+
+        with open(file_path, 'r') as file:
+            for line in file:
+                if f"'user_id':'{customer_id}'" not in line:
+                    lines.append(line)
+
+        if len(lines) == 0:
+            return False
+
+        with open(file_path, 'w') as file:
+            file.writelines(lines)
+
         return True
 
     @staticmethod
@@ -100,11 +126,35 @@ class CustomerOperation:
 
     @staticmethod
     def delete_all_customers():
-        # Remove all customers from the data/users.txt file
         with open('data/users.txt', 'w') as file:
             file.truncate()
 
 # Example usage
 customer_op = CustomerOperation()
-registered = customer_op.register_customer('JohnDoe', 'password123', 'john.doe@example.com', '0412345678')
+# registered = customer_op.register_customer('JohnDoe', 'password123', 'john.doe@example.com', '0412345678')
+# registered = customer_op.register_customer('Ritika', 'password123', 'ritika10arora@gmail.com', '0412345678')
+# registered = customer_op.register_customer('RitikaA', 'password12345', 'ritikacsarora@gmail.com', '0412345678')
 
+# customer = Customer()
+# customer.user_id = 'u_9465399634'
+# customer.user_name = 'Ritika'
+
+# # Call the update_profile function
+# success = CustomerOperation.update_profile('user_name', 'RitikaArora', customer)
+
+# if success:
+#     print("Profile updated successfully.")
+# else:
+#     print("Failed to update profile.")
+
+# deleted = customer_op.delete_customer('u_9465399634')
+# if deleted:
+#     print("Customer deleted successfully.")
+# else:
+#     print("Customer not found in the file.")
+
+# cust_list=customer_op.get_customer_list(2)
+# print(cust_list)
+
+
+# customer_op.delete_all_customers()

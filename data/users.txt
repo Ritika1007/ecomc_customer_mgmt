@@ -1,1 +1,0 @@
-{'user_id':'u_8398928455', 'user_name':'JohnDoe', 'user_password':'^^ZxpMUaw7sVrsx5wUGomircSdD91lE29d3$$', 'user_register_time':'27-06-2023_12:52:26', 'user_role':'customer', 'user_email':'john.doe@example.com', 'user_mobile':'0412345678'}
