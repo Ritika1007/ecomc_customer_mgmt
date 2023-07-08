@@ -11,3 +11,5 @@ class Order:
 # Example usage
 # order = Order(order_id='o_12345', user_id='u_98765', pro_id='p_456', order_time='12-06-2023_15:30:00')
 # print(order)
+
+# To reduce the program difficulty, we assume each order only has one product.
